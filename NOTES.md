@@ -59,8 +59,9 @@ npm start
     Currently, the reflected changes on the UI are only visible after you start typing a new prompt
     (The data however, currently gets fetched token by token in real-time, can be inspected in the console of the browser)
 
-    Resulting Output: 
-    ![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/bug.png)
+Resulting Output: 
+![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/bug.png)
+
 
 
 ## UX, Architecture and Scale Considerations
