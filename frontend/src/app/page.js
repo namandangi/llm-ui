@@ -31,6 +31,7 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    const socket = connection.current;
     if (!prompt) {
       setError("Please enter a prompt.");
       return;

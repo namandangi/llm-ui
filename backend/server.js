@@ -20,11 +20,14 @@ app.post("/", async (req, res) => {
   res.send(responseHTML);
 });
 
+const clients = [];
+
 const establishWSServerForFrontend = () => {
   const wss = new WebSocket.Server({ port: 8080 });
   console.log("setup ws server");
     wss.on('connection', function connection(ws) {
 
+      clients.push(ws);
         // can't send the ws object out
         console.log('connected to ws2');
         ws.send('sending test message to client');
@@ -48,6 +51,15 @@ const establishWSClientForAPI = () => {
     
     // Should send prompt from frontend to api here
     // wss.send('Football Players');
+
+      if(clients.length > 0){
+        clients.forEach(client => {
+          client.on('message', function incoming(data) {
+            console.log('Received from frontend:', data.toString());
+            wss.send(data);
+          });
+        })
+      }
 
   });
 
