@@ -5,6 +5,7 @@ const WebSocket = require("ws");
 
 const { getRichieRichResponse } = require("./clients/richieRich");
 const RRML2HTML = require("./utils/RRML2HTML");
+const { client } = require("websocket");
 
 const PORT = 8081;
 const app = express();
@@ -52,6 +53,8 @@ const establishWSClientForAPI = () => {
     // Should send prompt from frontend to api here
     // wss.send('Football Players');
 
+      // def not a great idea? need to maintain a session mapping between client id to api server id, redis?
+      console.log("num clients: ", clients.length);
       if(clients.length > 0){
         clients.forEach(client => {
           client.on('message', function incoming(data) {
@@ -60,16 +63,32 @@ const establishWSClientForAPI = () => {
           });
         })
       }
-
   });
 
   wss.on('message', (message) => {
+
     console.log('Received message from API:', (message.toString()));
+
+      if (clients.length > 0) {        
+        clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+              client.send(RRML2HTML(message.toString()));
+          }
+        });
+      } else {
+          console.log('No clients connected');
+      }
   });
 }
 
 establishWSClientForAPI();
 establishWSServerForFrontend();
+
+// Maybe keep polling for active connections? setTimeout/setInterval? 
+// Still requires manual refreshing for client
+
+// #Hacker 101
+setInterval(establishWSClientForAPI, 5000);
 
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

@@ -41,11 +41,7 @@ export default function Home() {
       setIsLoadingResponse(true);
       addMessage(prompt, agentTypes.user);
       
-
       socket.send(prompt);
-
-      // const response = await getPromptResponse(prompt);
-      // addMessage(response, agentTypes.richieRich);
 
       setPrompt("");
       setIsLoadingResponse(false);
