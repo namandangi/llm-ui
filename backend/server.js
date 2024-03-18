@@ -8,6 +8,7 @@ const RRML2HTML = require("./utils/RRML2HTML");
 
 const PORT = 8081;
 const app = express();
+const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +20,25 @@ app.post("/", async (req, res) => {
   res.send(responseHTML);
 });
 
+const establishWSServerForFrontend = () => {
+  const wss = new WebSocket.Server({ port: 8080 });
+  console.log("setup ws server");
+    wss.on('connection', function connection(ws) {
+
+        // can't send the ws object out
+        console.log('connected to ws2');
+        ws.send('sending test message to client');
+
+        ws.on('message', function incoming(data) {
+          console.log('Received from frontend:', data.toString());
+        });
+         
+    });
+
+  return wss;
+}
+
+
 const establishWSClientForAPI = () => {
   
   const wss = new WebSocket('ws://localhost:8082/v1/stream');
@@ -27,7 +47,7 @@ const establishWSClientForAPI = () => {
     console.log('WebSocket connection established!');
     
     // Should send prompt from frontend to api here
-    wss.send('Football Players');
+    // wss.send('Football Players');
 
   });
 
@@ -37,7 +57,8 @@ const establishWSClientForAPI = () => {
 }
 
 establishWSClientForAPI();
+establishWSServerForFrontend();
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

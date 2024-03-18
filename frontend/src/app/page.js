@@ -14,6 +14,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState(null);
   const scrollContainerRef = useRef(null);
+  const connection = useRef(null);
 
   const handleTextAreaChange = (event) => {
     setPrompt(event.target.value);
@@ -38,8 +39,13 @@ export default function Home() {
     try {
       setIsLoadingResponse(true);
       addMessage(prompt, agentTypes.user);
-      const response = await getPromptResponse(prompt);
-      addMessage(response, agentTypes.richieRich);
+      
+
+      socket.send(prompt);
+
+      // const response = await getPromptResponse(prompt);
+      // addMessage(response, agentTypes.richieRich);
+
       setPrompt("");
       setIsLoadingResponse(false);
     } catch (error) {
@@ -51,6 +57,29 @@ export default function Home() {
   useEffect(() => {
     scrollContainerRef.current.scrollTop =
       scrollContainerRef.current.scrollHeight;
+  }, [messages]);
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8080")
+    connection.current = socket;
+
+    // Connection opened
+    socket.addEventListener("open", (event) => {
+      socket.send("Connection established")
+    }); 
+
+    return () => socket.close();
+  }, []);
+
+  useEffect(() => {
+    const socket = connection.current;
+
+    // Listen for messages
+    socket.addEventListener("message", (event) => {
+      console.log("Message from server ", event.data);
+      addMessage(event.data, agentTypes.richieRich);
+    });
+
   }, [messages]);
 
   return (
