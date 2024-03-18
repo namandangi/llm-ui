@@ -11,6 +11,7 @@ const agentTypes = {
 export default function Home() {
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [msgID, setMsgID] = useState(0);
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState(null);
   const scrollContainerRef = useRef(null);
@@ -20,15 +21,37 @@ export default function Home() {
     setPrompt(event.target.value);
   };
 
-  const addMessage = (message, agent) => {
+  const addMessage = (message, agent, msgID) => {
     setMessages((prev) => [
       ...prev,
       {
         agent,
         contents: message,
+        msgID
       },
     ]);
   };
+
+  const updateLastMessage = (message, agent, msgID) => {
+    setMessages((arr) => {
+      const index = msgID == 0 ? 0 : msgID - 1; // update the last msg      
+      
+      if (index !== -1) {
+        let updatedContent = arr[index]?.contents ? arr[index]?.contents + message : message;
+        let updatedObject = {
+          agent,
+          contents: updatedContent,
+          msgID
+        }
+        console.log(arr[index], updatedObject);
+        arr.splice(index, 1, updatedObject);
+      } else {
+        console.log(`Object with msg number ${msgID} not found.`);
+      }
+      return arr;
+    });
+  };
+
 
   const handleSubmit = async () => {
     const socket = connection.current;
@@ -40,6 +63,8 @@ export default function Home() {
     try {
       setIsLoadingResponse(true);
       addMessage(prompt, agentTypes.user);
+      addMessage(" ", agentTypes.richieRich, msgID+1);
+      setMsgID(msgID+2);
       
       socket.send(prompt);
 
@@ -74,7 +99,8 @@ export default function Home() {
     // Listen for messages
     socket.addEventListener("message", (event) => {
       console.log("Message from server ", event.data);
-      addMessage(event.data, agentTypes.richieRich);
+      // addMessage(event.data, agentTypes.richieRich);
+      updateLastMessage(event.data, agentTypes.richieRich, msgID-1);
     });
 
   }, [messages]);
@@ -89,6 +115,7 @@ export default function Home() {
           message.agent === agentTypes.user ? (
             <ChatPrompt key={index} prompt={message.contents} />
           ) : (
+            
             <ChatResponse key={index} response={message.contents} />
           ),
         )}
