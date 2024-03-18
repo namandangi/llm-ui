@@ -63,5 +63,13 @@ Resulting Output:
 ![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/bug.png)
 
 
-
 ## UX, Architecture and Scale Considerations
+
+![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/arch.jpeg)
+
+    
+    UX: 
+
+    Architecture:
+
+    Scale
