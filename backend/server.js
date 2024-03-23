@@ -31,7 +31,6 @@ const establishWSServerForFrontend = () => {
       clients.push(ws);
         // can't send the ws object out
         console.log('connected to ws2');
-        ws.send('sending test message to client');
 
         ws.on('message', function incoming(data) {
           console.log('Received from frontend:', data.toString());
@@ -49,10 +48,7 @@ const establishWSClientForAPI = () => {
 
   wss.on('open', () => {
     console.log('WebSocket connection established!');
-    
-    // Should send prompt from frontend to api here
-    // wss.send('Football Players');
-
+  
       // def not a great idea? need to maintain a session mapping between client id to api server id, redis?
       console.log("num clients: ", clients.length);
       if(clients.length > 0){

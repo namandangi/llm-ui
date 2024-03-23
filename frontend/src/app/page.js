@@ -32,24 +32,10 @@ export default function Home() {
     ]);
   };
 
-  const updateLastMessage = (message, agent, msgID) => {
-    setMessages((arr) => {
-      const index = msgID == 0 ? 0 : msgID - 1; // update the last msg      
-      
-      if (index !== -1) {
-        let updatedContent = arr[index]?.contents ? arr[index]?.contents + message : message;
-        let updatedObject = {
-          agent,
-          contents: updatedContent,
-          msgID
-        }
-        console.log(arr[index], updatedObject);
-        arr.splice(index, 1, updatedObject);
-      } else {
-        console.log(`Object with msg number ${msgID} not found.`);
-      }
-      return arr;
-    });
+  const updateLastMessage = (message, idToBeUpdated) => {
+    setMessages(prevMsgs => prevMsgs.map(msg => 
+      msg.msgID == idToBeUpdated ? {...msg, contents: msg.contents + message} : msg
+      ));
   };
 
 
@@ -62,8 +48,9 @@ export default function Home() {
     setError(null);
     try {
       setIsLoadingResponse(true);
-      addMessage(prompt, agentTypes.user);
-      addMessage(" ", agentTypes.richieRich, msgID+1);
+
+      addMessage(prompt, agentTypes.user, msgID);
+      addMessage("", agentTypes.richieRich, msgID+1);
       setMsgID(msgID+2);
       
       socket.send(prompt);
@@ -77,8 +64,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    scrollContainerRef.current.scrollTop =
-      scrollContainerRef.current.scrollHeight;
+    scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      // scrollContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
@@ -97,10 +84,12 @@ export default function Home() {
     const socket = connection.current;
 
     // Listen for messages
-    socket.addEventListener("message", (event) => {
-      console.log("Message from server ", event.data);
+    socket.addEventListener("message", async (event) => {
+      console.log("Message from server ", event);
       // addMessage(event.data, agentTypes.richieRich);
-      updateLastMessage(event.data, agentTypes.richieRich, msgID-1);
+      updateLastMessage(event.data, msgID-1);
+
+      
     });
 
   }, [messages]);
