@@ -14,6 +14,8 @@ export default function Home() {
   const [msgID, setMsgID] = useState(0);
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const maxReconnectAttempts = 5;
   const scrollContainerRef = useRef(null);
   const connection = useRef(null);
 
@@ -51,6 +53,7 @@ export default function Home() {
 
       addMessage(prompt, agentTypes.user, msgID);
       addMessage("", agentTypes.richieRich, msgID+1);
+
       setMsgID(msgID+2);
       
       socket.send(prompt);
@@ -68,16 +71,48 @@ export default function Home() {
       // scrollContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useEffect(() => {
+  const setupWebSocket = () => {
     const socket = new WebSocket("ws://localhost:8080")
     connection.current = socket;
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      socket.send("Connection established")
+      socket.send("Connection established");
+      setReconnectAttempts(0);
     }); 
 
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket error observed:", event);
+    });
+
+    socket.addEventListener("close", (event) => {
+      console.log(`WebSocket closed with code: ${event.code}`);
+      handleReconnect();
+    });
+
     return () => socket.close();
+  }
+
+  const handleReconnect = () => {
+    if (reconnectAttempts < maxReconnectAttempts) {
+        let timeout = Math.pow(2, reconnectAttempts) * 1000; // Exponential backoff
+        setReconnectAttempts(reconnectAttempts + 1);
+        setTimeout(() => {
+            setupWebSocket(); // Attempt to reconnect
+        }, timeout);
+    } else {
+        console.log("Max reconnect attempts reached, not attempting further reconnects.");
+    }
+};
+
+  useEffect(() => {
+    setupWebSocket();
+    const socket = connection.current;
+    return () => {
+      if(socket.readyState === WebSocket.OPEN) {
+        socket.close(); // Close WebSocket on component unmount
+      } 
+    }
   }, []);
 
   useEffect(() => {
@@ -86,10 +121,7 @@ export default function Home() {
     // Listen for messages
     socket.addEventListener("message", async (event) => {
       console.log("Message from server ", event);
-      // addMessage(event.data, agentTypes.richieRich);
-      updateLastMessage(event.data, msgID-1);
-
-      
+      updateLastMessage(event.data, msgID-1); // msgID points to new prompt for user so msgID -1 refers to last o/p from API
     });
 
   }, [messages]);
