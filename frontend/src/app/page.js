@@ -68,7 +68,6 @@ export default function Home() {
 
   useEffect(() => {
     scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-      // scrollContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const setupWebSocket = () => {
@@ -77,7 +76,8 @@ export default function Home() {
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      socket.send("Connection established");
+      // socket.send("Connection established");
+      console.log("Connection established")
       setReconnectAttempts(0);
     }); 
 
@@ -96,8 +96,8 @@ export default function Home() {
   const handleReconnect = () => {
     if (reconnectAttempts < maxReconnectAttempts) {
         let timeout = Math.pow(2, reconnectAttempts) * 1000; // Exponential backoff
-        setReconnectAttempts(reconnectAttempts + 1);
         setTimeout(() => {
+            setReconnectAttempts(reconnectAttempts + 1);
             setupWebSocket(); // Attempt to reconnect
         }, timeout);
     } else {
