@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getPromptResponse } from "../../api/getPromptResponse";
 import { ChatResponse, ChatPrompt, TextArea } from "../components/chat";
 
@@ -19,11 +19,11 @@ export default function Home() {
   const scrollContainerRef = useRef(null);
   const connection = useRef(null);
 
-  const handleTextAreaChange = (event) => {
+  const handleTextAreaChange = useCallback((event) => {
     setPrompt(event.target.value);
-  };
+  }, [prompt]);
 
-  const addMessage = (message, agent, msgID) => {
+  const addMessage = useCallback((message, agent, msgID) => {
     setMessages((prev) => [
       ...prev,
       {
@@ -32,16 +32,16 @@ export default function Home() {
         msgID
       },
     ]);
-  };
+  }, []);
 
-  const updateLastMessage = (message, idToBeUpdated) => {
+  const updateLastMessage = useCallback((message, idToBeUpdated) => {
     setMessages(prevMsgs => prevMsgs.map(msg => 
       msg.msgID == idToBeUpdated ? {...msg, contents: msg.contents + message} : msg
       ));
-  };
+  }, []);
 
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const socket = connection.current;
     if (!prompt) {
       setError("Please enter a prompt.");
@@ -64,7 +64,7 @@ export default function Home() {
       setError("An error occurred. Please try again.");
       setIsLoadingResponse(false);
     }
-  };
+  });
 
   useEffect(() => {
     scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
@@ -76,7 +76,6 @@ export default function Home() {
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      // socket.send("Connection established");
       console.log("Connection established")
       setReconnectAttempts(0);
     }); 

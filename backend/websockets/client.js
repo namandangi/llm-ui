@@ -42,7 +42,7 @@ class WebSocketClient {
       setTimeout(() => {
         this.reconnectAttempts += 1;
         console.log(`Attempting to reconnect (attempt ${this.reconnectAttempts})...`);
-        this.connect(); // Attempt to reconnect
+        this.connect();
       }, timeout);
     } else {
       console.log('Max reconnect attempts reached, not attempting further reconnects.');

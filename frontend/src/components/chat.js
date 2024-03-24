@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import Image from "next/image";
 import richieRich from "../../assets/richieRich.webp";
 import profilePicture from "../../assets/profilePicture.jpeg";
 
-export const ChatResponse = ({ response }) => (
+export const ChatResponse = memo(({ response }) => (
   <div className="p-10 prose bg-white my-6 rounded-lg mx-auto w-full">
     <div className="flex items-center gap-4">
       <Image
@@ -19,9 +19,9 @@ export const ChatResponse = ({ response }) => (
     </div>
     <div className="" dangerouslySetInnerHTML={{ __html: response }} />
   </div>
-);
+));
 
-export const ChatPrompt = ({ prompt }) => (
+export const ChatPrompt = memo(({ prompt }) => (
   <div className="p-10 prose bg-white my-6 rounded-lg mx-auto w-full">
     <div className="flex items-center gap-4">
       <Image
@@ -36,9 +36,9 @@ export const ChatPrompt = ({ prompt }) => (
 
     <div className="w-full">{prompt}</div>
   </div>
-);
+));
 
-export const TextArea = ({ onChange, onSubmit, isLoading, hasError }) => {
+export const TextArea = memo(({ onChange, onSubmit, isLoading, hasError }) => {
   const [text, setText] = useState("");
 
   const handleChange = (event) => {
@@ -68,7 +68,7 @@ export const TextArea = ({ onChange, onSubmit, isLoading, hasError }) => {
       </button>
     </div>
   );
-};
+});
 
 const LoadingSpinner = () => {
   return (
