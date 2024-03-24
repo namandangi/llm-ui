@@ -7,16 +7,18 @@ const agentTypes = {
   user: "User",
   richieRich: "RichieRich",
 };
+const maxReconnectAttempts = 5;
+const debouncingInterval = 20; // in ms --> the performance varies drastically for different prompts | still 15-25 is a sweet spot
+const socketURL = "ws://localhost:8080";
 
 export default function Home() {
+  // debugger
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [messages, setMessages] = useState([]);
   const [msgID, setMsgID] = useState(0);
   const [prompt, setPrompt] = useState("");
   const [error, setError] = useState(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
-  const maxReconnectAttempts = 5;
-  const debouncingInterval = 20; // in ms --> the performance varies drastically for different prompts | still 15-25 is a sweet spot
   const scrollContainerRef = useRef(null);
   const genText = useRef("");
   const connection = useRef(null);
@@ -78,12 +80,12 @@ export default function Home() {
   }, [messages]);
 
   const setupWebSocket = () => {
-    const socket = new WebSocket("ws://localhost:8080")
+    const socket = new WebSocket(socketURL)
     connection.current = socket;
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      console.log("Connection established")
+      console.log("Connection established");
       setReconnectAttempts(0);
     }); 
 
@@ -121,15 +123,19 @@ export default function Home() {
     }
   }, []);
 
+  const handleMessage = async (event) => {
+    console.log("Message from server ", event);
+    genText.current += event.data;
+    debouncedUpdateLastMessage(genText.current, msgID - 1); 
+  };
+
   useEffect(() => {
     const socket = connection.current;
 
     // Listen for messages
-    socket.addEventListener("message", async (event) => {
-      console.log("Message from server ", event);
-      genText.current += event.data;
-      debouncedUpdateLastMessage(genText.current, msgID - 1);  // msgID points to new prompt for user so msgID -1 refers to last o/p from API
-    });
+    socket.addEventListener("message", handleMessage);
+
+    return () => socket.removeEventListener("message", handleMessage); // important to unmount the even listener or else it creates duplicate messages
 
   }, [messages]);
 
