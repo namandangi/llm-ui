@@ -10,7 +10,9 @@ const { WebSocketServer, WebSocketClient } = require('./websockets/index');
 
 const PORT = 8081;
 const wss_PORT = 8080;
+const maxReconnectAttempts = 5;
 const wss_URL = 'ws://localhost:8082/v1/stream';
+
 const app = express();
 const server = http.createServer(app);
 
@@ -26,10 +28,11 @@ app.post("/", async (req, res) => {
 
 
 const wsserver = new WebSocketServer(wss_PORT);
-const wsclient = new WebSocketClient(wss_URL, (data) => {
+const wsclient = new WebSocketClient(wss_URL, maxReconnectAttempts, (data) => {
   wsserver.broadcast(data);
 });
 
+wsclient.connect();
 wsserver.start();
 
 wsserver.wss.on('connection', (ws) => {
