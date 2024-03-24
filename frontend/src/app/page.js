@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { getPromptResponse } from "../../api/getPromptResponse";
+import { debounce } from "lodash";
 import { ChatResponse, ChatPrompt, TextArea } from "../components/chat";
 
 const agentTypes = {
@@ -16,7 +16,9 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const maxReconnectAttempts = 5;
+  const debouncingInterval = 20; // in ms --> the performance varies drastically for different prompts | still 15-25 is a sweet spot
   const scrollContainerRef = useRef(null);
+  const genText = useRef("");
   const connection = useRef(null);
 
   const handleTextAreaChange = useCallback((event) => {
@@ -38,7 +40,12 @@ export default function Home() {
     setMessages(prevMsgs => prevMsgs.map(msg => 
       msg.msgID == idToBeUpdated ? {...msg, contents: msg.contents + message} : msg
       ));
+      genText.current = "";
   }, []);
+
+  const debouncedUpdateLastMessage = debounce((data, id) => {
+    updateLastMessage(data, id);
+  }, debouncingInterval);
 
 
   const handleSubmit = useCallback(async () => {
@@ -120,7 +127,8 @@ export default function Home() {
     // Listen for messages
     socket.addEventListener("message", async (event) => {
       console.log("Message from server ", event);
-      updateLastMessage(event.data, msgID-1); // msgID points to new prompt for user so msgID -1 refers to last o/p from API
+      genText.current += event.data;
+      debouncedUpdateLastMessage(genText.current, msgID - 1);  // msgID points to new prompt for user so msgID -1 refers to last o/p from API
     });
 
   }, [messages]);
