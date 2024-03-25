@@ -27,13 +27,29 @@ cd../richeRich
 npm install
 ```
 
-#### 3. Run all the servers
+#### 3. Create a .env file for your backend (optional)
+
+From root directory go to your backend service 
+
+```
+cd ./backend
+touch .env
+cp -v .env.example .env 
+```
+
+Fill out the appropriate environment values, you can refer to default config values in backend using 
+
+```
+cat ./config/constants.js
+``` 
+
+#### 4. Run all the servers
 
 From the root directory of the project using
 
 
 (Open a new terminal session for each service)
-**Note:** Backend service should be started after richieRich
+
 ```
 cd ./frontend
 npm run dev
@@ -47,9 +63,18 @@ npm run start
 
 ```
 cd ./backend
-npm start
+npm run start
 ```
 
+Answer to Questions:
+
+1. If you were given 2 weeks time, what changes would you make to the project to enhance code quality, UX, performance, or scalability.
+
+    - All UX and code structuring related criteria implemented over the week and high-level thoughts around scale and architecture documented below.  
+    
+2. Anything you'd like us to know about your submission? 
+
+    - All the key features such as debouncing, class based components, UI optimization, unit tests, UX imporvements, exponential backoff re-connection for Websocket clients, etc. addressed below. 
 
 ### Demo:
  
@@ -69,8 +94,8 @@ npm start
 
 ## UX, Architecture and Scale Considerations
 
-![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/arch.jpeg)
 
+![](https://github.com/namandangi/gptzero-fs-assessment-2024/blob/master/static/arch.jpeg)
 
 
 **Architecture:** 
