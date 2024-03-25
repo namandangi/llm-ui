@@ -16,6 +16,11 @@ class WebSocketClient {
       this.reconnectAttempts = 0;
     });
 
+    this.ws.on('error', (err) => {
+      console.log(`Threw an error ${err}`);
+      this.handleReconnect();
+    });
+
     this.ws.on('close', () => {
       console.log('Disconnected from third-party API');
       this.handleReconnect();
