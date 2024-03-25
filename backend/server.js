@@ -1,17 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
-const WebSocket = require("ws");
 
 const { getRichieRichResponse } = require("./clients/richieRich");
 const RRML2HTML = require("./utils/RRML2HTML");
-const { client } = require("websocket");
 const { WebSocketServer, WebSocketClient } = require('./websockets/index');
-
-const PORT = 8081;
-const wss_PORT = 8080;
-const maxReconnectAttempts = 5;
-const wss_URL = 'ws://localhost:8082/v1/stream';
+const { PORT, wss_PORT, maxReconnectAttempts, wss_URL } = require('./config/constants');
 
 const app = express();
 const server = http.createServer(app);
