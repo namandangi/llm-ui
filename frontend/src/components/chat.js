@@ -51,6 +51,10 @@ export const TextArea = memo(({ onChange, onSubmit, isLoading, hasError }) => {
     setText("");
   };
 
+  const isTextEmpty = () => {
+    return text === "";
+  }
+
   return (
     <div className="flex absolute bottom-0 w-full h-1/6 p-10  bg-slate-950 shadow">
       <textarea
@@ -58,14 +62,19 @@ export const TextArea = memo(({ onChange, onSubmit, isLoading, hasError }) => {
         onChange={handleChange}
         value={text}
       ></textarea>
-      <button
+      {isTextEmpty() ? (<button
         onClick={handleClick}
-        className="bg-gray-600 p-2 mx-4 rounded-xl w-20 h-fit my-auto flex justify-center items-center"
-        disabled={isLoading}
-      >
+        className="bg-gray-600 p-2 mx-4 rounded-xl w-20 h-fit my-auto flex justify-center items-center"        
+        disabled={isLoading}>
         {isLoading && <LoadingSpinner />}
         Send
-      </button>
+      </button>) : (<button
+        onClick={handleClick}
+        className="text-black bg-white p-2 mx-4 rounded-xl w-20 h-fit my-auto flex justify-center items-center"
+        disabled={isLoading}>
+          {isLoading && <LoadingSpinner />}
+        Send
+      </button>)}
     </div>
   );
 });
