@@ -34,7 +34,7 @@ export const ChatPrompt = memo(({ prompt }) => (
       <div className="font-semibold text-lg">You</div>
     </div>
 
-    <div className="w-full">{prompt}</div>
+    <div className="break-words w-full">{prompt}</div>
   </div>
 ));
 
@@ -58,7 +58,7 @@ export const TextArea = memo(({ onChange, onSubmit, isLoading, hasError }) => {
   return (
     <div className="flex absolute bottom-0 w-full h-1/6 p-10  bg-slate-950 shadow">
       <textarea
-        className={`w-full rounded-xl bg-slate-900 border border-gray-500  p-2 text-white ${hasError ? "border-red-500" : ""}`}
+        className={`break-all w-full rounded-xl bg-slate-900 border border-gray-500  p-2 text-white ${hasError ? "border-red-500" : ""}`}
         onChange={handleChange}
         value={text}
       ></textarea>
